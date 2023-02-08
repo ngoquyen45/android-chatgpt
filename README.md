@@ -45,6 +45,12 @@ You can download ChatGPT for Android from the Google Play Store at the following
 - Quick and accurate responses on a variety of topics
 - User-friendly interface optimized for mobile devices
 
+## Screenshots
+
+![ChatGPT for Android Screenshot 1](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/0.jpg)
+![ChatGPT for Android Screenshot 2](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/1.jpg)
+![ChatGPT for Android Screenshot 2](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/2.jpg)
+
 ## Getting Started
 
 To use ChatGPT for Android, simply launch the app and start typing. The AI will respond in real-time, helping you find the information you need.
