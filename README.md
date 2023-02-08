@@ -14,9 +14,11 @@ You can download ChatGPT for Android from the Google Play Store at the following
 
 ## Screenshots
 
-![ChatGPT for Android Screenshot 1](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/0.jpg)
-![ChatGPT for Android Screenshot 2](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/1.jpg)
-![ChatGPT for Android Screenshot 2](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/2.jpg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/0.jpg" width="270" height="480" />
+  <img src="https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/1.jpg" width="270" height="480" />
+  <img src="https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/screenshots/2.jpg" width="270" height="480" />
+</p>
 
 ## Getting Started
 
