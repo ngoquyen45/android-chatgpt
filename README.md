@@ -4,7 +4,7 @@ This Android application is powered by OpenAI's ChatGPT language model. With Cha
 
 ## Download
 
-You can download ChatGPT for Android from the Google Play Store at the following link: [ChatGPT for Android](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/apk/android-chatgpt.apk)
+You can download ChatGPT for Android from the following link: [ChatGPT for Android](https://raw.githubusercontent.com/ngoquyen45/android-chatgpt/master/apk/android-chatgpt.apk)
 
 ## Screenshots
 
