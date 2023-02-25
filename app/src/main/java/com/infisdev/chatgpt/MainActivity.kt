@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var linearProgressIndicator: LinearProgressIndicator
     private val handler by lazy { Handler(Looper.getMainLooper()) }
     private var backPressedOnce = false
-    private var currentColor = 0
     private val exitToast by lazy {
         Toast.makeText(
             applicationContext,
@@ -33,7 +32,6 @@ class MainActivity : AppCompatActivity() {
             Toast.LENGTH_SHORT
         )
     }
-
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -152,25 +150,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeNavigationBarColor(color: String) {
-        if (color == "rgba(0, 0, 0, 0)") {
-            changeNavigationBarColor(Color.WHITE)
-        } else {
-            changeNavigationBarColor(ContextCompat.getColor(applicationContext, R.color.status_bar_color))
+        synchronized(this) {
+            if (color == "rgba(0, 0, 0, 0)") {
+                changeNavigationBarColor(Color.WHITE)
+            } else {
+                changeNavigationBarColor(ContextCompat.getColor(applicationContext, R.color.status_bar_color))
+            }
         }
     }
 
     private fun changeNavigationBarColor(colorInt: Int) {
-        this.currentColor = colorInt
-        if (currentColor != colorInt)
-            window.navigationBarColor = colorInt
+        window.navigationBarColor = colorInt
     }
 
     inner class BridgeWebView {
         @JavascriptInterface
         fun updateNavigation(value: String) {
-            handler.post {
-                changeNavigationBarColor(value)
-            }
+            handler.post { changeNavigationBarColor(value) }
         }
     }
 
