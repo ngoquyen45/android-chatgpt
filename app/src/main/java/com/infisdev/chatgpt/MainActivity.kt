@@ -58,6 +58,8 @@ class MainActivity : AppCompatActivity() {
                 javaScriptEnabled = true
                 cacheMode = WebSettings.LOAD_DEFAULT
             }
+            val jsInterface = MyJavaScriptInterface(applicationContext)
+            webView.addJavascriptInterface(jsInterface, "Android")
             loadUrl("https://chat.openai.com")
         }
 
@@ -100,8 +102,9 @@ class MainActivity : AppCompatActivity() {
         webView.evaluateJavascript(
             """var element = document.querySelector('#__next > div.overflow-hidden.w-full.h-full.relative > div.dark.hidden.bg-gray-900.md\\:fixed.md\\:inset-y-0.md\\:flex.md\\:w-\\[260px\\].md\\:flex-col > div > div > nav > a:nth-child(5)');
             element.addEventListener('click', function() {
-                // timeout
-                
+                setTimeout(function() {
+                    Android.showToast("The element was clicked!");
+                }, 2000);
             });
         """.trimIndent()
         ) { value -> Log.d("Evaluate Javascript", value) }
@@ -168,6 +171,15 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.navigationBarColor = white
     }
+
+    class MyJavaScriptInterface internal constructor(var mContext: Context) {
+        @JavascriptInterface
+        fun showToast(message: String?) {
+            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
     companion object {
         const val CHAT = "chat.openai.com/chat"
     }
