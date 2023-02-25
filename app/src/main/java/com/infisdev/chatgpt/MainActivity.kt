@@ -1,17 +1,22 @@
 package com.infisdev.chatgpt
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.WindowManager
+import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.google.android.material.progressindicator.LinearProgressIndicator
 
@@ -89,6 +94,19 @@ class MainActivity : AppCompatActivity() {
 
         // Loại bỏ phần thừa của web
         webView.evaluateJavascript(
+            "window.getComputedStyle(document.body,null).getPropertyValue('background-color')"
+        ) { value -> changeNavigationBarColor(value) }
+
+        webView.evaluateJavascript(
+            """var element = document.querySelector('#__next > div.overflow-hidden.w-full.h-full.relative > div.dark.hidden.bg-gray-900.md\\:fixed.md\\:inset-y-0.md\\:flex.md\\:w-\\[260px\\].md\\:flex-col > div > div > nav > a:nth-child(5)');
+            element.addEventListener('click', function() {
+                // timeout
+                
+            });
+        """.trimIndent()
+        ) { value -> Log.d("Evaluate Javascript", value) }
+
+        webView.evaluateJavascript(
             """setInterval(function() {
             var element_hide = document.querySelector('#__next > div.overflow-hidden.w-full.h-full.relative > div > main > div.absolute.bottom-0.left-0.w-full.border-t.md\\:border-t-0.dark\\:border-white\\/20.md\\:border-transparent.md\\:dark\\:border-transparent.md\\:bg-vert-light-gradient.bg-white.dark\\:bg-gray-800.md\\:\\!bg-transparent.dark\\:md\\:bg-vert-dark-gradient > div');
             if (element_hide) { element_hide.style.display = 'none'; }
@@ -138,6 +156,18 @@ class MainActivity : AppCompatActivity() {
         ) { value -> Log.d("Evaluate Javascript", value) }
     }
 
+    private fun changeNavigationBarColor(color: String) {
+        if (color == "rgba(0, 0, 0, 0)") {
+            changeNavigationBarColor(Color.WHITE)
+        } else {
+            changeNavigationBarColor(ContextCompat.getColor(applicationContext, R.color.status_bar_color))
+        }
+    }
+
+    private fun changeNavigationBarColor(white: Int) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.navigationBarColor = white
+    }
     companion object {
         const val CHAT = "chat.openai.com/chat"
     }
