@@ -141,6 +141,10 @@ class MainActivity : AppCompatActivity() {
               location.reload();
             });
             selector.appendChild(button);
+            
+            var button2 = button.cloneNode(true);
+            button2.style.visibility = "hidden";
+            selector.insertBefore(button2, selector.getElementsByTagName('h1')[0]);
         }, 1000);""".trimIndent()
         ) { value -> Log.d("Evaluate Javascript", value) }
     }
