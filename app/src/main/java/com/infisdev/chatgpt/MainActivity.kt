@@ -1,7 +1,6 @@
 package com.infisdev.chatgpt
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
@@ -26,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var linearProgressIndicator: LinearProgressIndicator
     private val handler by lazy { Handler(Looper.getMainLooper()) }
     private var backPressedOnce = false
+    private var currentColor = 0
     private val exitToast by lazy {
         Toast.makeText(
             applicationContext,
@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         setContentView(R.layout.activity_main)
         webView = findViewById(R.id.webView)
         linearProgressIndicator = findViewById(R.id.linearProgressIndicator)
@@ -59,6 +60,7 @@ class MainActivity : AppCompatActivity() {
                     customWeb(url)
                 }
             }
+            addJavascriptInterface(BridgeWebView(), "android")
             loadUrl("https://chat.openai.com")
         }
         setupOnBack()
@@ -97,15 +99,13 @@ class MainActivity : AppCompatActivity() {
         if (!url.contains(CHAT)) return
         webView.evaluateJavascript(
             """setInterval(function() {
+            android.updateNavigation(window.getComputedStyle(document.body,null).getPropertyValue('background-color'))
+                
             var element_hide = document.querySelector('#__next > div.overflow-hidden.w-full.h-full.relative > div > main > div.absolute.bottom-0.left-0.w-full.border-t.md\\:border-t-0.dark\\:border-white\\/20.md\\:border-transparent.md\\:dark\\:border-transparent.md\\:bg-vert-light-gradient.bg-white.dark\\:bg-gray-800.md\\:\\!bg-transparent.dark\\:md\\:bg-vert-dark-gradient > div');
             if (element_hide) { element_hide.style.display = 'none'; }
             var element_padding = document.querySelector('#__next > div.overflow-hidden.w-full.h-full.relative > div > main > div.absolute.bottom-0.left-0.w-full.border-t.md\\:border-t-0.dark\\:border-white\\/20.md\\:border-transparent.md\\:dark\\:border-transparent.md\\:bg-vert-light-gradient.bg-white.dark\\:bg-gray-800.md\\:\\!bg-transparent.dark\\:md\\:bg-vert-dark-gradient > form');
             if (element_padding) { element_padding.style.paddingBottom = '0.5rem'; }
-        }, 1000);""".trimIndent()
-        ) { value -> Log.d("Evaluate Javascript", value) }
-
-        webView.evaluateJavascript(
-            """setInterval(function() {
+            
             var selector = document.querySelector("#__next > div.overflow-hidden.w-full.h-full.relative > div > div");
             if (!selector) return;
             if (selector.querySelector("#my-button")) return;
@@ -145,6 +145,8 @@ class MainActivity : AppCompatActivity() {
             var button2 = button.cloneNode(true);
             button2.style.visibility = "hidden";
             selector.insertBefore(button2, selector.getElementsByTagName('h1')[0]);
+            
+            
         }, 1000);""".trimIndent()
         ) { value -> Log.d("Evaluate Javascript", value) }
     }
@@ -157,9 +159,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun changeNavigationBarColor(white: Int) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.navigationBarColor = white
+    private fun changeNavigationBarColor(colorInt: Int) {
+        this.currentColor = colorInt
+        if (currentColor != colorInt)
+            window.navigationBarColor = colorInt
+    }
+
+    inner class BridgeWebView {
+        @JavascriptInterface
+        fun updateNavigation(value: String) {
+            handler.post {
+                changeNavigationBarColor(value)
+            }
+        }
     }
 
     companion object {
