@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,10 @@ class MainActivity : AppCompatActivity() {
         linearProgressIndicator = findViewById(R.id.linearProgressIndicator)
 
         webView.apply {
+            settings.apply {
+                javaScriptEnabled = true
+                cacheMode = WebSettings.LOAD_DEFAULT
+            }
             webViewClient = object : WebViewClient() {
                 override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                     linearProgressIndicator.isVisible = true
@@ -54,15 +59,8 @@ class MainActivity : AppCompatActivity() {
                     customWeb(url)
                 }
             }
-            settings.apply {
-                javaScriptEnabled = true
-                cacheMode = WebSettings.LOAD_DEFAULT
-            }
-            val jsInterface = MyJavaScriptInterface(applicationContext)
-            webView.addJavascriptInterface(jsInterface, "Android")
             loadUrl("https://chat.openai.com")
         }
-
         setupOnBack()
     }
 
@@ -92,23 +90,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun customWeb(url: String) {
-        if (!url.contains(CHAT)) return
-
-        // Loại bỏ phần thừa của web
         webView.evaluateJavascript(
             "window.getComputedStyle(document.body,null).getPropertyValue('background-color')"
         ) { value -> changeNavigationBarColor(value) }
 
-        webView.evaluateJavascript(
-            """var element = document.querySelector('#__next > div.overflow-hidden.w-full.h-full.relative > div.dark.hidden.bg-gray-900.md\\:fixed.md\\:inset-y-0.md\\:flex.md\\:w-\\[260px\\].md\\:flex-col > div > div > nav > a:nth-child(5)');
-            element.addEventListener('click', function() {
-                setTimeout(function() {
-                    Android.showToast("The element was clicked!");
-                }, 2000);
-            });
-        """.trimIndent()
-        ) { value -> Log.d("Evaluate Javascript", value) }
-
+        if (!url.contains(CHAT)) return
         webView.evaluateJavascript(
             """setInterval(function() {
             var element_hide = document.querySelector('#__next > div.overflow-hidden.w-full.h-full.relative > div > main > div.absolute.bottom-0.left-0.w-full.border-t.md\\:border-t-0.dark\\:border-white\\/20.md\\:border-transparent.md\\:dark\\:border-transparent.md\\:bg-vert-light-gradient.bg-white.dark\\:bg-gray-800.md\\:\\!bg-transparent.dark\\:md\\:bg-vert-dark-gradient > div');
@@ -171,14 +157,6 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.navigationBarColor = white
     }
-
-    class MyJavaScriptInterface internal constructor(var mContext: Context) {
-        @JavascriptInterface
-        fun showToast(message: String?) {
-            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
 
     companion object {
         const val CHAT = "chat.openai.com/chat"
