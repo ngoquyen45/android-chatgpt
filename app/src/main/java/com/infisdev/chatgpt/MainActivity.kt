@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities.TRANSPORT_CELLULAR
+import android.net.NetworkCapabilities.TRANSPORT_WIFI
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -179,6 +182,22 @@ class MainActivity : AppCompatActivity() {
         window.navigationBarColor = colorInt
     }
 
+    enum class NetworkType {
+        WIFI,
+        CELLULAR,
+        UNKNOWN
+    }
+
+    private fun getNetworkType(): NetworkType {
+        val manager = applicationContext.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val caps = manager.getNetworkCapabilities(manager.activeNetwork)
+        return when {
+            caps != null && caps.hasTransport(TRANSPORT_WIFI) -> NetworkType.WIFI
+            caps != null && caps.hasTransport(TRANSPORT_CELLULAR) -> NetworkType.CELLULAR
+            else -> NetworkType.UNKNOWN
+        }
+    }
+
     inner class BridgeWebView {
         @JavascriptInterface
         fun updateNavigation(value: String) {
@@ -187,7 +206,11 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun openWifiSetting() {
-            startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+            when(getNetworkType()) {
+                NetworkType.WIFI -> startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                NetworkType.CELLULAR -> startActivity(Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS))
+                NetworkType.UNKNOWN -> startActivity(Intent(Settings.ACTION_SETTINGS))
+            }
         }
     }
 
