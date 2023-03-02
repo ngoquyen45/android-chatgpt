@@ -8,10 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.WindowManager
-import android.webkit.JavascriptInterface
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +53,22 @@ class MainActivity : AppCompatActivity() {
                     linearProgressIndicator.isVisible = false
                     super.onPageFinished(view, url)
                     customWeb(url)
+                }
+
+                override fun onReceivedError(
+                    view: WebView,
+                    request: WebResourceRequest,
+                    error: WebResourceError
+                ) {
+                    loadUrl("file:///android_asset/html/error.html")
+                }
+
+                override fun onReceivedHttpError(
+                    view: WebView,
+                    request: WebResourceRequest,
+                    errorResponse: WebResourceResponse
+                ) {
+                    loadUrl("file:///android_asset/html/error.html")
                 }
             }
             addJavascriptInterface(BridgeWebView(), "android")
