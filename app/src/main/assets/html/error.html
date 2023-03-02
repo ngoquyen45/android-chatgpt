@@ -5,7 +5,7 @@
     <title>Custom HTML Page</title>
     <style>
 		body {
-			background-color: #434654;
+			background-color: #353542;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -18,27 +18,33 @@
 			color: red;
 		}
 		p {
-			font-size: 1.2em;
-			margin: 0;
+		    color: white;
+			font-size: 1rem;
+			margin: 1.05rem;
 		}
 		button {
-			background-color: blue;
+			background-color: #00a67d;
 			color: white;
-			padding: 10px 20px;
-			border-radius: 5px;
+			padding: 0.6rem 1.05rem;
+			border-radius: 0.3rem;
 			border: none;
+			font-size: 0.9rem;
+			user-select: none;
 		}
+
+		button:hover {
+            background-color: #008e6b;
+        }
 	</style>
 </head>
 <body>
-<h1>Hello World!</h1>
-<p>This is a custom HTML page.</p>
-<button onclick="refreshPage()">Refresh</button>
+<p>Check your network connection</p>
+<button onclick="check()">Check</button>
 
 <script>
-		function refreshPage() {
-			location.reload();
-		}
-	</script>
+    function check() {
+        android.openWifiSetting()
+    }
+</script>
 </body>
 </html>

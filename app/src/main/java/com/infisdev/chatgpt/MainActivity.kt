@@ -1,11 +1,13 @@
 package com.infisdev.chatgpt
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.WindowManager
 import android.webkit.*
@@ -14,7 +16,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility", "CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -38,6 +43,13 @@ class MainActivity : AppCompatActivity() {
         webView = findViewById(R.id.webView)
         linearProgressIndicator = findViewById(R.id.linearProgressIndicator)
 
+        ReactiveNetwork
+            .observeInternetConnectivity()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { isConnectedToInternet ->
+                onNetworkChanged(isConnectedToInternet)
+            }
         webView.apply {
             settings.apply {
                 javaScriptEnabled = true
@@ -54,27 +66,18 @@ class MainActivity : AppCompatActivity() {
                     super.onPageFinished(view, url)
                     customWeb(url)
                 }
-
-                override fun onReceivedError(
-                    view: WebView,
-                    request: WebResourceRequest,
-                    error: WebResourceError
-                ) {
-                    loadUrl("file:///android_asset/html/error.html")
-                }
-
-                override fun onReceivedHttpError(
-                    view: WebView,
-                    request: WebResourceRequest,
-                    errorResponse: WebResourceResponse
-                ) {
-                    loadUrl("file:///android_asset/html/error.html")
-                }
             }
             addJavascriptInterface(BridgeWebView(), "android")
             loadUrl("https://chat.openai.com")
         }
         setupOnBack()
+    }
+
+    private fun onNetworkChanged(isConnectedToInternet: Boolean) {
+        if (!isConnectedToInternet)
+            webView.loadUrl("file:///android_asset/html/error.html")
+        else
+            webView.loadUrl("https://chat.openai.com/chat")
     }
 
     private fun setupOnBack() {
@@ -180,6 +183,11 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun updateNavigation(value: String) {
             handler.post { changeNavigationBarColor(value) }
+        }
+
+        @JavascriptInterface
+        fun openWifiSetting() {
+            startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
         }
     }
 
